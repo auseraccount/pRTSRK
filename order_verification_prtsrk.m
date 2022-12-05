@@ -27,56 +27,30 @@
     c = tildeAB*e - tildeD*L;
     fprintf('Butcher tableau of TSRK(%d, %d):\n', stage, order);
     [tildeD tildeAB]
-    syms x;
-    modify_flag = 2; %1: pTSRK1; 2: pTSRK2;
-    hatD(1, 1) = sym(1); hatD(2, 2) = sym(1); orderp = order;
-    if modify_flag == 1 % pTSRK1
-        hatc(1) = sym(-1); hatc(2) = sym(0); psi(1) = sym(1); psi(2) = exp((1+c(2))*x);
-        for i = 3:length(c)
-            % To accelerate computations, we apply Taylor expansions to psi
-            psi(i) = taylor((tildeD(i,1) * exp((1+c(1))*x) + tildeD(i,2)*exp((1+c(2))*x)), x, 0, 'order', orderp+2);
-            for j = 1:i-1
-                psi(i) = taylor(psi(i) + tildeAB(i,j).* exp((1+c(j))*x) .* x, x, 0, 'order', orderp+2);
-            end
-            for j = 1:2
-                hatD(i,j) = taylor(1/psi(i) * (tildeD(i,j) .* exp((1+c(j))*x)), x, 0, 'order', orderp+2);
-                for k = 1:i-1
-                    hatD(i,j) = taylor(hatD(i,j) + 1/psi(i) * x * tildeAB(i,k)*exp((1+c(k))*x) * hatD(k,j), x, 0, 'order', orderp+2);
-                end
-            end
-            hatc(i) = -hatD(i,1);
-            for j = 1:i-1
-                hatAB(i,j) = taylor(1/psi(i) * (tildeAB(i,j)*exp((1+c(j))*x)), x, 0, 'order', orderp+2);
-                for k = 3: i-1
-                    hatAB(i,j) = taylor(hatAB(i,j) + 1/psi(i) * x * tildeAB(i,k) * exp((1+c(k))*x) * hatAB(k,j), x, 0, 'order', orderp+2);
-                end
-                hatc(i) = hatc(i) + hatAB(i,j);
+    syms x; 
+    hatD(1, 1) = sym(1); hatD(2, 2) = sym(1); orderp = order; 
+    hatc(1) = sym(-1); hatc(2) = sym(0);
+    psi(1) = sym(phi{orderp}((1+c(1))*x)); psi(2) = phi{orderp}((1+c(2))*x);
+    for i = 3:length(c)
+        psi(i) =  taylor(tildeD(i,1)*psi(1) + tildeD(i,2)*psi(2), x, 0, 'order', orderp+2);
+        for j = 1:i-1
+            psi(i) = taylor(psi(i) + tildeAB(i,j).* psi(j) .* x, x, 0, 'order', orderp+2);
+        end
+        for j = 1:2
+            hatD(i,j) = taylor(1/psi(i) * tildeD(i,j) * psi(j), x, 0, 'order', orderp+2);
+            for k = 1:i-1
+                hatD(i,j) = taylor(hatD(i,j) + 1/psi(i) * x * tildeAB(i,k) * psi(k) * hatD(k,j), x, 0, 'order', orderp+2);
             end
         end
-    elseif modify_flag == 2
-        hatc(1) = sym(-1); hatc(2) = sym(0);
-        psi(1) = sym(phi{orderp}((1+c(1))*x)); psi(2) = phi{orderp}((1+c(2))*x);
-        for i = 3:length(c)
-            psi(i) =  taylor(tildeD(i,1)*psi(1) + tildeD(i,2)*psi(2), x, 0, 'order', orderp+2);
-            for j = 1:i-1
-                psi(i) = taylor(psi(i) + tildeAB(i,j).* psi(j) .* x, x, 0, 'order', orderp+2);
+        hatc(i) = -hatD(i,1);
+        for j = 1:i-1
+            hatAB(i,j) = taylor(1/psi(i) * tildeAB(i,j) * psi(j), x, 0, 'order', orderp+2);
+            for k = 3: i-1
+                hatAB(i,j) = taylor(hatAB(i,j) + 1/psi(i) * x * tildeAB(i,k) * psi(k) * hatAB(k,j), x, 0, 'order', orderp+2);
             end
-            for j = 1:2
-                hatD(i,j) = taylor(1/psi(i) * tildeD(i,j) * psi(j), x, 0, 'order', orderp+2);
-                for k = 1:i-1
-                    hatD(i,j) = taylor(hatD(i,j) + 1/psi(i) * x * tildeAB(i,k) * psi(k) * hatD(k,j), x, 0, 'order', orderp+2);
-                end
-            end
-            hatc(i) = -hatD(i,1);
-            for j = 1:i-1
-                hatAB(i,j) = taylor(1/psi(i) * tildeAB(i,j) * psi(j), x, 0, 'order', orderp+2);
-                for k = 3: i-1
-                    hatAB(i,j) = taylor(hatAB(i,j) + 1/psi(i) * x * tildeAB(i,k) * psi(k) * hatAB(k,j), x, 0, 'order', orderp+2);
-                end
-                hatc(i) = hatc(i) + hatAB(i,j);
-            end
+            hatc(i) = hatc(i) + hatAB(i,j);
         end
-    end
+    end 
     
     hatA = hatAB(1:end-1, :); hatB = hatAB(end, :);
     hattheta = hatD(end, :); hatc = hatc(:);
