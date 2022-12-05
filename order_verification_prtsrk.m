@@ -1,4 +1,4 @@
-%% Verify the order conditions of pRTSRK schemes developed in 
+%% Verify the order conditions of pRTSRK schemes developed in
 % Ref. H. Zhang, et al. Large time-stepping, delay-free, and maximum-principle-preserving integrators for the viscous Cahn-Hilliard-Oono equation, 2022
     
     phi = cell(9, 1);
