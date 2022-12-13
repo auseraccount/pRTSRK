@@ -55,7 +55,7 @@
         indv = 1:2:length(xv);
         figure;
         for i =  1:size(hatc, 2)
-            plot(xv(indv), hatc(indv, i),'markersize', 4); hold on;
+            plot(xv(indv), hatc(indv, i)); hold on;
         end
         axis([0 200 -0.05 1]);
         title_str = ['TSRK(' num2str(stage) ',' num2str(order) ')'];
