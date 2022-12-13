@@ -60,6 +60,6 @@
         axis([0 200 -0.05 1]);
         title_str = ['TSRK(' num2str(stage) ',' num2str(order) ')'];
         title(title_str);
-        xlabel('$\tau \kappa$', 'interpreter', 'latex', 'fontsize', fs-4);
-        ylabel('$\hat{c}_i$','interpreter', 'latex', 'fontsize', fs-4);
+        xlabel('$\tau \kappa$', 'interpreter', 'latex', 'fontsize', 14);
+        ylabel('$\hat{c}_i$','interpreter', 'latex', 'fontsize', 14);
     end
